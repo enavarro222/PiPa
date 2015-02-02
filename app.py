@@ -7,6 +7,8 @@ from flask import render_template
 from flask.ext.socketio import SocketIO
 from flask.ext.socketio import emit
 
+import gevent
+
 ## Build the app
 app = Flask(__name__)
 app.debug = True
@@ -21,8 +23,16 @@ model = {
     "value": 0,
 }
 
-@app.route("/inc")
-def inc():
+
+
+@app.route("/model/reset")
+def model_reset():
+    model["value"] = 0
+    socketio.emit('update', model, namespace='/model')
+    return "ok"
+
+@app.route("/model/inc")
+def model_inc():
     model["value"] += 1
     socketio.emit('update', model, namespace='/model')
     return "ok"
@@ -33,7 +43,13 @@ def test_connect():
     emit('Connected', {'data': 'Connected'})
 
 
-if __name__ == '__main__':
-    socketio.run(app)    ## run the app
+def auto_inc():
+    while True:
+        model_inc()
+        gevent.sleep(1)
 
+
+if __name__ == '__main__':
+    auto_inc_worker = gevent.spawn(auto_inc)
+    socketio.run(app, host="0.0.0.0", port=5005)
 
