@@ -1,13 +1,27 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 import sys
+import logging
 
 from flask import Flask
-from flask import render_template
+from flask import render_template, jsonify
 from flask.ext.socketio import SocketIO
 from flask.ext.socketio import emit
 
-import gevent
+from sources import StupidCount, CpuUsage
+
+# data source configuration
+sources = [
+    StupidCount("count"),
+    CpuUsage("cpu"),
+]
+
+logger = logging.getLogger()
+
+# index of sources by name
+source_idx = {
+    src.name: src for src in sources
+}
 
 ## Build the app
 app = Flask(__name__)
@@ -19,37 +33,53 @@ socketio = SocketIO(app)
 def index():
     return render_template('index.html')
 
-model = {
-    "value": 0,
-}
+
+@app.route("/source")
+def sources_list():
+    res = {}
+    res["nb"] = len(sources)
+    res["sources"] = [src.desc() for src in sources]
+    return jsonify(res)
 
 
+@app.route("/source/<source>")
+def source_get(source):
+    src = source_idx[source]
+    res = src.export()
+    return jsonify(res)
 
-@app.route("/model/reset")
-def model_reset():
-    model["value"] = 0
-    socketio.emit('update', model, namespace='/model')
-    return "ok"
+def register_source(src):
+    namespace = '/source/'+src.name
 
-@app.route("/model/inc")
-def model_inc():
-    model["value"] += 1
-    socketio.emit('update', model, namespace='/model')
-    return "ok"
+    def change_callback():
+        socketio.emit('update', src.export(), namespace=namespace)
+    src.on_change(change_callback)
 
-@socketio.on('connect', namespace='/model')
-def test_connect():
-    print "Connected !!"
-    emit('Connected', {'data': 'Connected'})
+    def on_connect():
+        print "Connected to %s" % namespace
+        emit('Connected', src.desc())
+    socketio.on('connect', namespace=namespace)(on_connect)
 
+# plug change callback
+for src in sources:
+    register_source(src)
 
-def auto_inc():
-    while True:
-        model_inc()
-        gevent.sleep(1)
-
+# run sources
+for src in sources:
+    src.start()
 
 if __name__ == '__main__':
-    auto_inc_worker = gevent.spawn(auto_inc)
+    ## logger
+    level = logging.DEBUG
+    logger.setLevel(level)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(level)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s')
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(ch)
+
     socketio.run(app, host="0.0.0.0", port=5005)
 

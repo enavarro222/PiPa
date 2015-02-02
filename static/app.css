@@ -1,0 +1,11 @@
+
+
+.mainpage {
+    margin-top: 20px;
+}
+
+.ui.segment.swidget {
+    min-height: 140px;
+    padding-top: 25px;
+    vertical-align: middle;
+}

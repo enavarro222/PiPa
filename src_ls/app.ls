@@ -9,18 +9,26 @@ define do
     # Config de Cello
     DEBUG = true
 
-    ValueModel = Backbone.Model.extend do
-      defaults:
-        desc: "value"
-        value: 44
 
-      url: 'http://' + document.domain + ':' + location.port + "/model"
+    SourceModel = Backbone.Model.extend do
+      name: "source"
+
+      defaults:
+        label: null
+        value: 42
+        unit: null
+
+      url: ->
+        'http://' + document.domain + ':' + location.port + "/source/" + @name
 
       initialize: (attr, options) ->
-        @socket = io.connect(@url);
+        @name = options.name || @name
+        @socket = io.connect(@url!);
         # update model when data are send on msg "change"
         @socket.on \update (@set).bind @
+        @fetch!
         @
+
 
     TitleBar = React.create-class do
       render: ->
@@ -34,30 +42,47 @@ define do
 
 
     TextGauge = React.create-class do
-      componentDidMount: ->
+      componentWillMount: ->
         @props.model.on \change, @modelChanged
+
+      componentWillUnmount: ->
+        @props.model.off \change, @modelChanged
 
       modelChanged: !->
         @forceUpdate null
 
       render: ->
-        div {className: 'ui label'},
-          @props.model.get \desc
-          " :"
-          div {className:'detail'}
-            @props.model.get \value
+        div {className: 'ui three wide column'},
+          div {className: 'ui center aligned segment swidget'},
+            if @props.model.get \icon
+              p {className: 'ui huge header'},
+                i {className: 'huge icon ' + @props.model.get \icon}
+            div {className: 'ui large header'},
+              @props.model.get \value
+              if @props.model.get \unit
+                span {},
+                  ' '
+                  @props.model.get \unit
+            if @props.model.get \label
+              p {className: 'ui huge header'},
+                @props.model.get \label
 
+    # definition des sources de données
+    sources =
+      count: new SourceModel {}, {name: "count"}
+      cpu: new SourceModel {}, {name: "cpu"}
+
+    if DEBUG
+      window.sources = sources
 
     AppMain = React.create-class do
-      vmodel: new ValueModel null
       render: ->
-        if DEBUG
-          window.vmodel = @vmodel
-        div {className:'ui pusher'},
-          TitleBar null
+        div {className:'ui sidebar'},
+          null
+        div {className:'ui pusher mainpage'},
           div {className: 'ui page grid'},
-            div {className: 'column'},
-              TextGauge {model: @vmodel}
+            TextGauge {model: sources.count}
+            TextGauge {model: sources.cpu}
 
     # returned value: just the main component
     AppMain
