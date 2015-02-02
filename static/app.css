@@ -1,7 +1,10 @@
 
+body{
+    height: inherit;
+}
 
-.mainpage {
-    margin-top: 20px;
+.gridster ul{
+    list-style: none;
 }
 
 .ui.segment.swidget {

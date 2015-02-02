@@ -94,7 +94,6 @@ class StupidCount(AutoUpdateValue):
     def update(self):
         self.value += 1
 
-
 class CpuUsage(AutoUpdateValue):
     unit = "%"
     label = ""

@@ -15,9 +15,12 @@ require.config do
     # semantic-ui
     semantic: '/static/lib/semantic/semantic.min'
 
+    gridster: '/static/lib/jquery.gridster.min'
     io: '/static/lib/socket.io-0.9.16.min'
     #io: '/static/lib/socket.io-1.3.2'
 
+#    moment: '/static/lib/moment.min'
+    moment: '/static/lib/moment-with-locales.min'
   shim:
     semantic: 
       deps: [ \jquery ]

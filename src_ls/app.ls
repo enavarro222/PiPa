@@ -1,6 +1,6 @@
 define do
-  [ \jquery \react 'prelude-ls' \backbone \io]
-  ($, React, Prelude, Backbone, io) ->
+  [ \jquery \react 'prelude-ls' \backbone \gridster \io \moment]
+  ($, React, Prelude, Backbone, Gridster, io, moment) ->
     # Advanced functional style programming using prelude-ls
     {map, filter, slice, lines, any, fold, Str} = require 'prelude-ls'
     # DOM building function from React
@@ -52,20 +52,44 @@ define do
         @forceUpdate null
 
       render: ->
-        div {className: 'ui three wide column'},
-          div {className: 'ui center aligned segment swidget'},
-            if @props.model.get \icon
-              p {className: 'ui huge header'},
-                i {className: 'huge icon ' + @props.model.get \icon}
-            div {className: 'ui large header'},
-              @props.model.get \value
-              if @props.model.get \unit
-                span {},
-                  ' '
-                  @props.model.get \unit
-            if @props.model.get \label
-              p {className: 'ui huge header'},
-                @props.model.get \label
+        div {className: 'ui center aligned segment swidget'},
+          if @props.model.get \icon
+            div {className: 'ui huge header'},
+              i {className: 'huge icon ' + @props.model.get \icon}
+          div {className: 'ui large header'},
+            @props.model.get \value
+            if @props.model.get \unit
+              span {},
+                ' '
+                @props.model.get \unit
+          if @props.model.get \label
+            p {className: 'ui huge header'},
+              @props.model.get \label
+
+
+    TimeDate = React.create-class do
+      getInitialState: ->
+        time: moment().format('HH:mm:ss')
+        date: moment().lang('fr').format('dddd D MMMM')
+
+      updateDate: ->
+        @setState do
+          time: moment().format('HH:mm:ss')
+          date: moment().lang('fr').format('dddd D MMMM')
+        @timeout = setTimeout (@updateDate).bind @, 1000
+
+      componentWillMount: ->
+        @updateDate!
+
+      componentWillUnmount: ->
+        clearTimeout(@timeout)
+
+      render: ->
+        div {className: 'ui center aligned segment swidget'},
+          div {className: 'ui huge header'},
+            @state.time
+          div {className: 'ui medium header'},
+            @state.date
 
     # definition des sources de données
     sources =
@@ -77,12 +101,21 @@ define do
 
     AppMain = React.create-class do
       render: ->
-        div {className:'ui sidebar'},
-          null
-        div {className:'ui pusher mainpage'},
-          div {className: 'ui page grid'},
-            TextGauge {model: sources.count}
-            TextGauge {model: sources.cpu}
+        div {className: 'gridster'},
+          ul {ref: 'maingrid'},
+            li {'data-row': 1, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+              TimeDate {}
+            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+              TextGauge {model: sources.count}
+            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
+              TextGauge {model: sources.cpu}
+
+      componentDidMount: ->
+        ($ @refs.maingrid.getDOMNode!).gridster do
+          'widget_margins': [10, 10]
+          'widget_base_dimensions': [140, 140]
+          'max_cols': 15
+          'min_cols': 1
 
     # returned value: just the main component
     AppMain
