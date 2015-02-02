@@ -91,6 +91,29 @@ define do
           div {className: 'ui medium header'},
             @state.date
 
+    WeekNum = React.create-class do
+      getInitialState: ->
+        week: moment().format('W')
+
+      updateDate: ->
+        @setState do
+          week: moment().format('W')
+        @timeout = setTimeout (@updateDate).bind @, 1000
+
+      componentWillMount: ->
+        @updateDate!
+
+      componentWillUnmount: ->
+        clearTimeout(@timeout)
+
+      render: ->
+        div {className: 'ui center aligned segment swidget'},
+          div {className: 'ui medium header'},
+            "semaine"
+          div {className: 'ui huge header'},
+            @state.week
+
+
     # definition des sources de données
     sources =
       count: new SourceModel {}, {name: "count"}
@@ -103,8 +126,10 @@ define do
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
-            li {'data-row': 1, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+            li {'data-row': 1, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 1},
               TimeDate {}
+            li {'data-row': 1, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
+              WeekNum {}
             li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
               TextGauge {model: sources.count}
             li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
