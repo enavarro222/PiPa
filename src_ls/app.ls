@@ -18,9 +18,9 @@ define do
         value: 42
         unit: null
         last_update: null
-        #timeout: 60*3       # bydefault becames outdated after 3 mins
-        timeout: 10       # bydefault becames outdated after 3 mins
+        timeout: 60*3      # bydefault becames outdated after 3 mins
         outdated: false     # whether the data is outdated
+        error: null         # error msg when outdated
 
       url: ->
         'http://' + document.domain + ':' + location.port + "/source/" + @name
@@ -44,15 +44,14 @@ define do
         lastUpdate = moment @.get 'last_update'
         if lastUpdate.isValid!
           timeout = @.get \timeout
-          console.log @get \name, lastUpdate
-          console.log moment!.format!
-          console.log lastUpdate.format!
-          console.log(moment!.diff lastUpdate, \second, timeout)
           if moment!.diff(lastUpdate, \second) > timeout
             @.set \outdated, true
+            @.set \error, (lastUpdate.fromNow true)
           else
             @.set \outdated, false
-          @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), timeout*500
+            @.set \error, null
+          # check every 15 seconds max:
+          @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), (Math.min timeout, 15)*1000
         @
 
 
