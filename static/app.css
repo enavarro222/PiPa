@@ -20,3 +20,12 @@ body{
 .gridster ul li .ui.segment.swidget {
     padding-top: 25px;
 }
+
+.gridster ul li .ui.segment .ui.floating.label {
+    position: absolute;
+    z-index: 100;
+    top: -0.6em;
+    right: -0.6em;
+    left: initial;
+    display: inline-table;
+}

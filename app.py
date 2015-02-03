@@ -17,13 +17,14 @@ from sources_emoncms import EmoncmsSource
 with open("emonsrc_config.txt") as emoncfg:
     url = emoncfg.readline().strip()
     key = emoncfg.readline().strip()
-    emoncms_grange = EmoncmsClient(url, key)
+    emoncms_beytan = EmoncmsClient(url, key)
 
 # data source configuration
 sources = [
-    StupidCount("count"),
+    StupidCount("count", update_freq=60),
     CpuUsage("cpu"),
-    EmoncmsSource("ext_temp", emoncms_grange, feedid=34, unit="°C"),
+    EmoncmsSource("ext_temp", emoncms_beytan, feedid=34, unit="°C"),
+    EmoncmsSource("grange_temp", emoncms_beytan, feedid=40, unit="°C"),
 ]
 
 logger = logging.getLogger()

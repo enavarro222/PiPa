@@ -1,5 +1,7 @@
 #-*- coding:utf-8 -*-
 import logging
+from datetime import datetime
+
 import gevent
 
 class DataSource(object):
@@ -43,11 +45,13 @@ class AutoUpdateValue(DataSource):
     def __init__(self, name, unit=None, update_freq=None):
         super(AutoUpdateValue, self).__init__(name=name)
         self._value = 0
+        self.last_update = None
         self.worker = None
         if unit is not None:
             self.unit = unit
         if update_freq is not None:
             self.update_freq = update_freq or AutoUpdateValue.update_freq
+        self.last_update = datetime.now()
         self.update()
 
     def update(self):
@@ -67,6 +71,7 @@ class AutoUpdateValue(DataSource):
 
     def auto_update(self):
         while True:
+            self.last_update = datetime.now()
             self.update()
             gevent.sleep(self.update_freq)
 
@@ -77,6 +82,7 @@ class AutoUpdateValue(DataSource):
         res = super(AutoUpdateValue, self).export()
         res["value"] = self.value
         res["unit"] = self.unit
+        res["last_update"] = self.last_update.isoformat()
         return res
 
 

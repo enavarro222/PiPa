@@ -14,5 +14,7 @@ class EmoncmsSource(AutoUpdateValue):
         super(EmoncmsSource, self).__init__(name=name, unit=unit, update_freq=update_freq)
 
     def update(self):
-        self.value = self.emoncms.get_value(self.feedid)["value"]
+        values = self.emoncms.get_value(self.feedid)
+        self.last_update = values["date"]
+        self.value = values["value"]
 
