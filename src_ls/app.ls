@@ -98,7 +98,7 @@ define do
       updateDate: ->
         @setState do
           week: moment().format('W')
-        @timeout = setTimeout (@updateDate).bind @, 1000
+        @timeout = setTimeout (@updateDate).bind @, 30*1000
 
       componentWillMount: ->
         @updateDate!
@@ -136,11 +136,13 @@ define do
               TextGauge {model: sources.cpu}
 
       componentDidMount: ->
-        ($ @refs.maingrid.getDOMNode!).gridster do
+        @grid = ($ @refs.maingrid.getDOMNode!).gridster do
           'widget_margins': [10, 10]
           'widget_base_dimensions': [140, 140]
           'max_cols': 15
           'min_cols': 1
+        .data 'gridster'
+        @grid.disable()
 
     # returned value: just the main component
     AppMain
