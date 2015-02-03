@@ -82,22 +82,17 @@ class AutoUpdateValue(DataSource):
         res = super(AutoUpdateValue, self).export()
         res["value"] = self.value
         res["unit"] = self.unit
-        res["label"] = self.label
-        res["icon"] = self.icon
         return res
 
 
 class StupidCount(AutoUpdateValue):
     unit = ""
-    label = "count"
 
     def update(self):
         self.value += 1
 
 class CpuUsage(AutoUpdateValue):
     unit = "%"
-    label = ""
-    icon = "lightning"
     update_freq = 1.9
 
     def update(self):

@@ -7,8 +7,16 @@ body{
     list-style: none;
 }
 
-.ui.segment.swidget {
-    min-height: 140px;
-    padding-top: 25px;
+.gridster ul li .ui.segment {
+    min-height: 100px;
     vertical-align: middle;
+    margin: 0;
+}
+
+.gridster ul>li>.ui.segment {
+    min-height: 140px;
+}
+
+.gridster ul li .ui.segment.swidget {
+    padding-top: 25px;
 }

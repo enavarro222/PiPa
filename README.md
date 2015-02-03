@@ -3,15 +3,23 @@ rPyBoard
 
 Dashboard pour rPy (ou autre)
 
-Site web a ouvrir en full screen, le serveur push les update.
+La config du dashboard se fait direct dans le source JS.
 
-Affichage possible:
-* valeur
-* unité
-* date/heure
-* image
-* courbe
-* jauge (min, max, value, unit)
+Site web a ouvrir en full screen, le serveur push les updates des sources de données (brut)
+
+Widgets type:
+* heure et date
+* numéro de semaine
+* generic value (icone, label, value/unit)
+* temperature/humidité d'une pièce/exterieur
+* liste d'info/event (avec date a chaque fois, éventuellement removable)
+  ** passage facteur
+  ** batterie faible (toutes les heures quand c'est le cas)
+  ** pic de conso
+
+
+Affichage:
+* doit feeter sur une page sans scroll
 
 config:
 * config coté serveur des sources existantes

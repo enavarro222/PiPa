@@ -53,18 +53,18 @@ define do
 
       render: ->
         div {className: 'ui center aligned segment swidget'},
-          if @props.model.get \icon
+          if @props.icon
             div {className: 'ui huge header'},
-              i {className: 'huge icon ' + @props.model.get \icon}
+              i {className: 'huge icon ' + @props.icon}
           div {className: 'ui large header'},
             @props.model.get \value
             if @props.model.get \unit
               span {},
                 ' '
                 @props.model.get \unit
-          if @props.model.get \label
+          if @props.label
             p {className: 'ui huge header'},
-              @props.model.get \label
+              @props.label
 
 
     TimeDate = React.create-class do
@@ -126,14 +126,23 @@ define do
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
-            li {'data-row': 1, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 1},
-              TimeDate {}
+            li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
+              div {className: 'ui segment grid'},
+                div {className: 'ui ten wide column'},
+                  TimeDate {}
+                div {className: 'ui six wide column'},
+                  WeekNum {}
             li {'data-row': 1, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-              WeekNum {}
-            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
-              TextGauge {model: sources.count}
+              div {className: 'ui segment'},
+                "TEST"
+            li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+              TextGauge do
+                model: sources.count
+                label: "count"
             li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
-              TextGauge {model: sources.cpu}
+              TextGauge do
+                model: sources.cpu
+                icon: "dashboard"
 
       componentDidMount: ->
         @grid = ($ @refs.maingrid.getDOMNode!).gridster do
