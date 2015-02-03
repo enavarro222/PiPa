@@ -37,21 +37,15 @@ class AutoUpdateValue(DataSource):
     * a single value (with a label and a unit)
     * an update methode called every N seconds
     """
-
     unit = ""
-    label = "value"
-    icon = ""
-
     update_freq = 1     # frequence of update
 
-    def __init__(self, name, unit=None, label=None, update_freq=None):
+    def __init__(self, name, unit=None, update_freq=None):
         super(AutoUpdateValue, self).__init__(name=name)
         self._value = 0
         self.worker = None
         if unit is not None:
             self.unit = unit
-        if label is not None:
-            self.label = label
         if update_freq is not None:
             self.update_freq = update_freq or AutoUpdateValue.update_freq
         self.update()
@@ -67,8 +61,9 @@ class AutoUpdateValue(DataSource):
 
     @value.setter
     def value(self, val):
-        self._value = val
-        self.changed()
+        if val != self._value:
+            self._value = val
+            self.changed()
 
     def auto_update(self):
         while True:

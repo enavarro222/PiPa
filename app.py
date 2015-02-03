@@ -8,12 +8,22 @@ from flask import render_template, jsonify
 from flask.ext.socketio import SocketIO
 from flask.ext.socketio import emit
 
+from emoncms import EmoncmsClient
+
 from sources import StupidCount, CpuUsage
+from sources_emoncms import EmoncmsSource
+
+## manage emoncms data source
+with open("emonsrc_config.txt") as emoncfg:
+    url = emoncfg.readline().strip()
+    key = emoncfg.readline().strip()
+    emoncms_grange = EmoncmsClient(url, key)
 
 # data source configuration
 sources = [
     StupidCount("count"),
     CpuUsage("cpu"),
+    EmoncmsSource("ext_temp", emoncms_grange, feedid=34, unit="°C"),
 ]
 
 logger = logging.getLogger()

@@ -1,12 +1,11 @@
 define do
-  [ \jquery \react 'prelude-ls' \backbone \gridster \io \moment]
-  ($, React, Prelude, Backbone, Gridster, io, moment) ->
+  [ \jquery \react 'prelude-ls' \backbone \gridster \io \moment, \widget]
+  ($, React, Prelude, Backbone, Gridster, io, moment, widget) ->
     # Advanced functional style programming using prelude-ls
     {map, filter, slice, lines, any, fold, Str} = require 'prelude-ls'
     # DOM building function from React
     {i, div, tr, td, span, kbd, button, ul, li, a, h1, h2, h3, input, form, table, th, tr, td, thead, tbody, label, nav, p, ruby, rt} = React.DOM
 
-    # Config de Cello
     DEBUG = true
 
 
@@ -14,7 +13,6 @@ define do
       name: "source"
 
       defaults:
-        label: null
         value: 42
         unit: null
 
@@ -30,94 +28,11 @@ define do
         @
 
 
-    TitleBar = React.create-class do
-      render: ->
-        div {className: 'ui menu navbar page grid'},
-          div {className: \container},
-            div {className: 'title item'},
-              "Info diverses"
-            div {className: "right menu"},
-              a {className: "item", href:\#},
-                "À propos"
-
-
-    TextGauge = React.create-class do
-      componentWillMount: ->
-        @props.model.on \change, @modelChanged
-
-      componentWillUnmount: ->
-        @props.model.off \change, @modelChanged
-
-      modelChanged: !->
-        @forceUpdate null
-
-      render: ->
-        div {className: 'ui center aligned segment swidget'},
-          if @props.icon
-            div {className: 'ui huge header'},
-              i {className: 'huge icon ' + @props.icon}
-          div {className: 'ui large header'},
-            @props.model.get \value
-            if @props.model.get \unit
-              span {},
-                ' '
-                @props.model.get \unit
-          if @props.label
-            p {className: 'ui huge header'},
-              @props.label
-
-
-    TimeDate = React.create-class do
-      getInitialState: ->
-        time: moment().format('HH:mm:ss')
-        date: moment().lang('fr').format('dddd D MMMM')
-
-      updateDate: ->
-        @setState do
-          time: moment().format('HH:mm:ss')
-          date: moment().lang('fr').format('dddd D MMMM')
-        @timeout = setTimeout (@updateDate).bind @, 1000
-
-      componentWillMount: ->
-        @updateDate!
-
-      componentWillUnmount: ->
-        clearTimeout(@timeout)
-
-      render: ->
-        div {className: 'ui center aligned segment swidget'},
-          div {className: 'ui huge header'},
-            @state.time
-          div {className: 'ui medium header'},
-            @state.date
-
-    WeekNum = React.create-class do
-      getInitialState: ->
-        week: moment().format('W')
-
-      updateDate: ->
-        @setState do
-          week: moment().format('W')
-        @timeout = setTimeout (@updateDate).bind @, 30*1000
-
-      componentWillMount: ->
-        @updateDate!
-
-      componentWillUnmount: ->
-        clearTimeout(@timeout)
-
-      render: ->
-        div {className: 'ui center aligned segment swidget'},
-          div {className: 'ui medium header'},
-            "semaine"
-          div {className: 'ui huge header'},
-            @state.week
-
-
     # definition des sources de données
     sources =
       count: new SourceModel {}, {name: "count"}
       cpu: new SourceModel {}, {name: "cpu"}
+      extTemp: new SourceModel {}, {name: "ext_temp"}
 
     if DEBUG
       window.sources = sources
@@ -129,18 +44,22 @@ define do
             li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
               div {className: 'ui segment grid'},
                 div {className: 'ui ten wide column'},
-                  TimeDate {}
+                  widget.TimeDate {}
                 div {className: 'ui six wide column'},
-                  WeekNum {}
+                  widget.WeekNum {}
             li {'data-row': 1, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
               div {className: 'ui segment'},
                 "TEST"
             li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
-              TextGauge do
+              widget.TextGauge do
                 model: sources.count
                 label: "count"
+            li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+              widget.TextGauge do
+                model: sources.extTemp
+                label: "Temp. ext."
             li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
-              TextGauge do
+              widget.TextGauge do
                 model: sources.cpu
                 icon: "dashboard"
 
