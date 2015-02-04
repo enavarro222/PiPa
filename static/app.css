@@ -1,26 +1,35 @@
 
 body{
     height: inherit;
+    background-color: #eee;
+    padding-top: 40px;
 }
 
 .gridster ul{
     list-style: none;
 }
 
-.gridster ul li .ui.segment {
+.gridster>ul>li>div{
+    margin: 0!important;
+    padding: 0!important;
+}
+
+.gridster ul li .swidget {
     min-height: 100px;
     vertical-align: middle;
-    margin: 0;
+    background-color: white;
 }
 
-.gridster ul>li>.ui.segment {
-    min-height: 140px;
+.gridster ul>li>.swidget {
 }
 
-.gridster ul li .ui.segment.swidget {
-    padding-top: 25px;
+.gridster ul li .swidget .ui.header{
+    margin-top: 0;
 }
 
+.gridster ul li>.swidget>.ui.header:first-child{
+    padding-top: 1em;
+}
 .gridster ul li .ui.segment .ui.floating.label {
     position: absolute;
     z-index: 100;

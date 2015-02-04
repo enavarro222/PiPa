@@ -20,7 +20,7 @@ define do
         last_update: null
         timeout: 60*3      # bydefault becames outdated after 3 mins
         outdated: false     # whether the data is outdated
-        error: null         # error msg when outdated
+        error: false        # error msg when outdated
 
       url: ->
         'http://' + document.domain + ':' + location.port + "/source/" + @name
@@ -49,7 +49,7 @@ define do
             @.set \error, (lastUpdate.fromNow true)
           else
             @.set \outdated, false
-            @.set \error, null
+            @.set \error, false
           # check every 15 seconds max:
           @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), (Math.min timeout, 15)*1000
         @
@@ -69,26 +69,27 @@ define do
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
+
             li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
-              div {className: 'ui segment grid'},
+              div {className: 'ui segment grid swidget'},
                 div {className: 'ui ten wide column'},
                   widget.TimeDate {}
                 div {className: 'ui six wide column'},
                   widget.WeekNum {}
-            li {'data-row': 1, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 2, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
               div {className: 'ui segment'},
                 "TEST"
-            li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.count
                 label: "count"
-            li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.extTemp
                 label: 
                   span {className: 'ui small header'},
                     "Temp. ext."
-            li {'data-row': 2, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.grangeTemp
                 label: 
@@ -98,15 +99,35 @@ define do
               widget.TextGauge do
                 model: sources.cpu
                 icon: "dashboard"
+            li {'data-row': 2, 'data-col': 3, 'data-sizex': 2, 'data-sizey': 2},
+              widget.CircleGauge do
+                model: sources.cpu
+                icon: "dashboard"
+                min: 0
+                max: 100
+                
 
       componentDidMount: ->
+        w = 140
+        h = 140
+        mw = 10
+        mh = 10
         @grid = ($ @refs.maingrid.getDOMNode!).gridster do
-          'widget_margins': [10, 10]
-          'widget_base_dimensions': [140, 140]
+          'widget_margins': [mw, mh]
+          'widget_base_dimensions': [w, h]
           'max_cols': 15
           'min_cols': 1
         .data 'gridster'
         @grid.disable()
+        $ @refs.maingrid.getDOMNode!
+          .find("li").each (i, li) ->
+            sizex = ($ li).attr "data-sizex"
+            sizey = ($ li).attr "data-sizey"
+            widgetW = w*sizex + 2*mw*(sizex - 1)
+            widgetH = h*sizey + 2*mh*(sizey - 1)
+            ($ li).first().children().first()
+              .width widgetW
+              .height widgetH
 
     # returned value: just the main component
     AppMain

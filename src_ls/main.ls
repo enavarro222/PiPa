@@ -21,6 +21,9 @@ require.config do
 
 #    moment: '/static/lib/moment.min'
     moment: '/static/lib/moment-with-locales.min'
+
+    d3: '/static/lib/d3.v3.min'
+
   shim:
     semantic: 
       deps: [ \jquery ]

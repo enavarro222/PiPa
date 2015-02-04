@@ -10,7 +10,7 @@ class DataSource(object):
     def __init__(self, name):
         self.name = name
         self.callbacks = []
-        self._logger = logging.getLogger()
+        self._logger = logging.getLogger(self.name)
 
     def on_change(self, callback):
         self.callbacks.append(callback)
@@ -72,6 +72,7 @@ class AutoUpdateValue(DataSource):
     def auto_update(self):
         while True:
             self.last_update = datetime.now()
+            self._logger.info("Update !")
             self.update()
             gevent.sleep(self.update_freq)
 
