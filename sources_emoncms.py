@@ -6,7 +6,7 @@ from sources import AutoUpdateValue
 import emoncms
 
 class EmoncmsSource(AutoUpdateValue):
-    update_freq = 60 # every minutes by default
+    update_freq = 6 # every minutes by default
 
     def __init__(self, name, emoncms, feedid, unit=None, update_freq=None):
         self.emoncms = emoncms
@@ -15,6 +15,6 @@ class EmoncmsSource(AutoUpdateValue):
 
     def update(self):
         values = self.emoncms.get_value(self.feedid)
-        self.last_update = values["date"]
         self.value = values["value"]
+        return values["date"]
 

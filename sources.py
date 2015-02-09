@@ -44,20 +44,17 @@ class AutoUpdateValue(DataSource):
 
     def __init__(self, name, unit=None, update_freq=None):
         super(AutoUpdateValue, self).__init__(name=name)
-        self._value = 0
-        self.last_update = None
         self.worker = None
+        self._value = 0
+        self._error = None
+        self.last_update = None
         if unit is not None:
             self.unit = unit
         if update_freq is not None:
             self.update_freq = update_freq or AutoUpdateValue.update_freq
-        self.last_update = datetime.now()
-        self.update()
-
-    def update(self):
-        """ Abstract update method
-        """
-        pass
+        self.prevous_update = None
+        self.last_update = None
+        self.checked_update()
 
     @property
     def value(self):
@@ -65,30 +62,59 @@ class AutoUpdateValue(DataSource):
 
     @value.setter
     def value(self, val):
-        if val != self._value:
-            self._value = val
-            self.changed()
+        self._value = val
 
-    def auto_update(self):
+    @property
+    def error(self):
+        return self._error
+
+    @error.setter
+    def error(self, val):
+        self._error = val
+
+    def update(self):
+        """ Abstract update method
+        
+        Returns None or the last date of the setted value
+        """
+        return None
+
+    def checked_update(self):
+        try:
+            last_update = self.update()
+            self.error = None
+            if last_update is None:
+                last_update = datetime.now()
+            self.prevous_update = self.last_update
+            self.last_update = last_update
+            if self.last_update != self.prevous_update:
+                self.changed()
+        except Exception as err:
+            self.error = "Error"
+            self.changed()
+            self._logger.error("update error: %s" % err)
+
+    def update_work(self):
         while True:
-            self.last_update = datetime.now()
             self._logger.info("Update !")
-            self.update()
+            self.checked_update()
             gevent.sleep(self.update_freq)
 
     def start(self):
-        self.worker = gevent.spawn(self.auto_update)
+        self.worker = gevent.spawn(self.update_work)
 
     def export(self):
         res = super(AutoUpdateValue, self).export()
         res["value"] = self.value
         res["unit"] = self.unit
+        res["error"] = self.error
         res["last_update"] = self.last_update.isoformat()
         return res
 
 
 class StupidCount(AutoUpdateValue):
     unit = ""
+    update_freq = 1
 
     def update(self):
         self.value += 1

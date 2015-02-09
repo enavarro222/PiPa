@@ -18,9 +18,9 @@ define do
         value: 42
         unit: null
         last_update: null
-        timeout: 60*3      # bydefault becames outdated after 3 mins
+        timeout: 60*3       # bydefault becames outdated after 3 mins
         outdated: false     # whether the data is outdated
-        error: false        # error msg when outdated
+        error: null         # error msg when outdated
 
       url: ->
         'http://' + document.domain + ':' + location.port + "/source/" + @name
@@ -36,6 +36,7 @@ define do
         @
 
       newDataPushed: (data) ->
+        console.log "new data", data
         @set data
         @checkOutDated!
 
@@ -48,10 +49,11 @@ define do
             @.set \outdated, true
             @.set \error, (lastUpdate.fromNow true)
           else
+            if @get \outdated
+              @.set \error, false
             @.set \outdated, false
-            @.set \error, false
           # check every 15 seconds max:
-          @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), (Math.min timeout, 15)*1000
+            @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), (Math.min timeout, 15)*1000
         @
 
 

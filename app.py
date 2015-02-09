@@ -21,7 +21,7 @@ with open("emonsrc_config.txt") as emoncfg:
 
 # data source configuration
 sources = [
-    StupidCount("count", update_freq=60),
+    StupidCount("count", update_freq=1),
     CpuUsage("cpu"),
     EmoncmsSource("ext_temp", emoncms_beytan, feedid=34, unit="°C"),
     EmoncmsSource("grange_temp", emoncms_beytan, feedid=40, unit="°C"),
