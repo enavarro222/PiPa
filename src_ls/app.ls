@@ -71,7 +71,6 @@ define do
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
-
             li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
               div {className: 'ui segment grid swidget'},
                 div {className: 'ui ten wide column'},
