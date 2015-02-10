@@ -58,10 +58,12 @@ define do
 
 
     # definition des sources de données
+    #TODO decouverte en auto !
     sources =
       count: new SourceModel {}, {name: "count"}
       cpu: new SourceModel {}, {name: "cpu"}
       extTemp: new SourceModel {}, {name: "ext_temp"}
+      extHum: new SourceModel {}, {name: "ext_hum"}
       grangeTemp: new SourceModel {}, {name: "grange_temp"}
 
     if DEBUG
@@ -78,29 +80,35 @@ define do
                 div {className: 'ui six wide column'},
                   widget.WeekNum {}
             li {'data-row': 2, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment'},
+              div {className: 'ui segment swidget'},
                 "TEST"
             li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.count
                 label: "count"
-            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.extTemp
                 label: 
                   span {className: 'ui small header'},
                     "Temp. ext."
-            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
+              widget.TextGauge do
+                model: sources.extHum
+                label: 
+                  span {className: 'ui small header'},
+                    "Hum. ext."
+            li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.grangeTemp
                 label: 
                   span {className: 'ui small header'},
                     "Temp. grange"
-            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.cpu
                 icon: "dashboard"
-            li {'data-row': 2, 'data-col': 3, 'data-sizex': 2, 'data-sizey': 2},
+            li {'data-row': 1, 'data-col': 8, 'data-sizex': 2, 'data-sizey': 2},
               widget.CircleGauge do
                 model: sources.cpu
                 icon: "dashboard"

@@ -26,6 +26,7 @@ sources = [
     StupidCount("count", update_freq=10),
     CpuUsage("cpu"),
     EmoncmsSource("ext_temp", emoncms_beytan, feedid=34, unit="°C"),
+    EmoncmsSource("ext_hum", emoncms_beytan, feedid=38, unit="%"),
     EmoncmsSource("grange_temp", emoncms_beytan, feedid=40, unit="°C"),
 ]
 

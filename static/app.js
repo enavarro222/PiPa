@@ -64,6 +64,9 @@
       extTemp: new SourceModel({}, {
         name: "ext_temp"
       }),
+      extHum: new SourceModel({}, {
+        name: "ext_hum"
+      }),
       grangeTemp: new SourceModel({}, {
         name: "grange_temp"
       })
@@ -94,7 +97,7 @@
           'data-sizex': 1,
           'data-sizey': 1
         }, div({
-          className: 'ui segment'
+          className: 'ui segment swidget'
         }, "TEST")), li({
           'data-row': 1,
           'data-col': 3,
@@ -105,7 +108,7 @@
           label: "count"
         })), li({
           'data-row': 1,
-          'data-col': 3,
+          'data-col': 4,
           'data-sizex': 1,
           'data-sizey': 1
         }, widget.TextGauge({
@@ -115,7 +118,17 @@
           }, "Temp. ext.")
         })), li({
           'data-row': 1,
-          'data-col': 3,
+          'data-col': 5,
+          'data-sizex': 1,
+          'data-sizey': 1
+        }, widget.TextGauge({
+          model: sources.extHum,
+          label: span({
+            className: 'ui small header'
+          }, "Hum. ext.")
+        })), li({
+          'data-row': 1,
+          'data-col': 6,
           'data-sizex': 1,
           'data-sizey': 1
         }, widget.TextGauge({
@@ -125,15 +138,15 @@
           }, "Temp. grange")
         })), li({
           'data-row': 1,
-          'data-col': 4,
+          'data-col': 7,
           'data-sizex': 1,
           'data-sizey': 1
         }, widget.TextGauge({
           model: sources.cpu,
           icon: "dashboard"
         })), li({
-          'data-row': 2,
-          'data-col': 3,
+          'data-row': 1,
+          'data-col': 8,
           'data-sizex': 2,
           'data-sizey': 2
         }, widget.CircleGauge({
