@@ -13,6 +13,8 @@ from emoncms import EmoncmsClient
 from sources import StupidCount, CpuUsage
 from sources_emoncms import EmoncmsSource
 
+from ctrl_api import api as ctrl_api
+
 ## manage emoncms data source
 with open("emonsrc_config.txt") as emoncfg:
     url = emoncfg.readline().strip()
@@ -36,13 +38,16 @@ source_idx = {
 
 ## Build the app
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+
+app.register_blueprint(ctrl_api, url_prefix="/ctrl")
 
 @app.route("/")
 def index():
     return render_template('index.html')
+
 
 
 @app.route("/source")

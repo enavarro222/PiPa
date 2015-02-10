@@ -1,7 +1,7 @@
 
 body{
     height: inherit;
-    background-color: #eee;
+    background-color: #111;
     padding-top: 40px;
 }
 
@@ -16,7 +16,7 @@ body{
 
 .gridster ul li .swidget {
     vertical-align: middle;
-    background-color: white;
+    background-color: #eee;
 }
 
 .gridster ul li .swidgetContent{
@@ -44,6 +44,7 @@ body{
     z-index: 100;
     top: -0.6em;
     right: -0.6em;
+    height: 1.1em;
     left: initial;
     display: inline-table;
 }
