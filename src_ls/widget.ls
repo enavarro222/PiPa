@@ -4,12 +4,14 @@ define do
     # Advanced functional style programming using prelude-ls
     {map, filter, slice, lines, any, fold, Str} = require 'prelude-ls'
     # DOM building function from React
-    {i, div, tr, td, span, kbd, button, ul, li, a, h1, h2, h3, input, form, table, th, tr, td, thead, tbody, label, nav, p, ruby, rt, svg, g, path} = React.DOM
+    {i, div, tr, td, span, kbd, button, ul, li, a, h1, h2, h3, input, form, table, th, tr, td, thead, tbody, label, nav, p, ruby, rt, svg, g, path, text} = React.DOM
 
     widget = {}
     window.React = React
 
     widget.CircleGauge = React.create-class do
+      delta: Math.PI/7.5    # angle en plus de horisontal
+
       getDefaultProps: ->
         min: 0
         max: 1
@@ -17,7 +19,7 @@ define do
       componentWillMount: ->
         @angle = d3.scale.linear!
           .domain [@props.min, @props.max] 
-          .range [1.1*-Math.PI/2, 1.1*Math.PI/2]
+          .range [- @delta - Math.PI/2, @delta + Math.PI/2]
         @props.model.on \change, @modelChanged.bind @
 
       componentWillUnmount: ->
@@ -30,6 +32,7 @@ define do
         div {className: 'ui center aligned segment swidget'},
           svg {ref: "gauge"},
             g {},
+              text {ref: "gaugeText"}
               path {ref: "gaugeBackground"}
               path {ref: "gaugeItSelf"}
 
@@ -41,12 +44,23 @@ define do
         rIn = 0.6 * rOut
         console.log w, h
 
-        d3.select @refs.gauge.getDOMNode!
+        svgg = d3.select @refs.gauge.getDOMNode!
             .attr "width", w
             .attr "height", h
             .select "g"
             .attr "transform", "translate(" + (w / 2) + "," + (h / 2) + ")"
-        
+
+
+        d3.select @refs.gaugeText.getDOMNode!
+            .text (@props.model.get \value) + " " + (@props.model.get \unit)
+            .attr "transform", "translate(" + 0 + "," + (h / 4) + ")"
+            .attr "text-anchor", "middle"
+            .attr "alignment-baseline", "middle"
+            .attr "font-family", "Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;"
+            .attr "font-size", "1.78em"
+            .attr "font-weight", "bold"
+            .attr "fill", "black"
+
         bgArc = d3.svg.arc!
           .innerRadius rIn
           .outerRadius rOut
@@ -72,6 +86,7 @@ define do
 
       componentDidMount: ->
         @renderSvg!
+
 
     widget.TextGauge = React.create-class do
       componentWillMount: ->

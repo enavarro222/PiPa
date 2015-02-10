@@ -16,10 +16,16 @@ from sources_emoncms import EmoncmsSource
 from ctrl_api import api as ctrl_api
 
 ## manage emoncms data source
-with open("emonsrc_config.txt") as emoncfg:
+with open("emonsrc_config_beytan.txt") as emoncfg:
     url = emoncfg.readline().strip()
-    key = emoncfg.readline().strip()
-    emoncms_beytan = EmoncmsClient(url, key)
+    key_beytan = emoncfg.readline().strip()
+    emoncms_beytan = EmoncmsClient(url, key_beytan)
+
+## manage emoncms data source
+with open("emonsrc_config_maison.txt") as emoncfg:
+    url = emoncfg.readline().strip()
+    key_beytan = emoncfg.readline().strip()
+    emoncms_maison = EmoncmsClient(url, key_beytan)
 
 # data source configuration
 sources = [
@@ -28,6 +34,7 @@ sources = [
     EmoncmsSource("ext_temp", emoncms_beytan, feedid=34, unit="°C"),
     EmoncmsSource("ext_hum", emoncms_beytan, feedid=38, unit="%"),
     EmoncmsSource("grange_temp", emoncms_beytan, feedid=40, unit="°C"),
+    EmoncmsSource("conso_pc", emoncms_maison, feedid=54, unit="W"),
 ]
 
 logger = logging.getLogger()

@@ -65,6 +65,7 @@ define do
       extTemp: new SourceModel {}, {name: "ext_temp"}
       extHum: new SourceModel {}, {name: "ext_hum"}
       grangeTemp: new SourceModel {}, {name: "grange_temp"}
+      consoPc: new SourceModel {}, {name: "conso_pc"}
 
     if DEBUG
       window.sources = sources
@@ -112,6 +113,14 @@ define do
                 icon: "dashboard"
                 min: 0
                 max: 100
+
+
+            li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+              widget.CircleGauge do
+                model: sources.consoPc
+                icon: "dashboard"
+                min: 0
+                max: 300
 
             li {'data-row': 3, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
               div {className: 'ui segment swidget'},

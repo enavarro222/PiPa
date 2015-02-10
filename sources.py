@@ -108,6 +108,7 @@ class AutoUpdateValue(DataSource):
         res["value"] = self.value
         res["unit"] = self.unit
         res["error"] = self.error
+        print self.last_update
         res["last_update"] = self.last_update.isoformat()
         return res
 

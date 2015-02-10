@@ -38,7 +38,7 @@ class EmoncmsClient(object):
     def feeds(self):
         """ Get data about all available feeds
         """
-        res = self._get_json(self.url + "/feed/list.json?userid=1")  #XXX: userid=1 to get public data (to check)
+        res = self._get_json(self.url + "/feed/list.json")  #XXX: userid=1 to get public data (to check)
         for feed in res:
             feed["id"] = int(feed["id"])
             feed["date"] = datetime.fromtimestamp(feed["time"])
