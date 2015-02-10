@@ -36,7 +36,7 @@ define do
         @
 
       newDataPushed: (data) ->
-        console.log "new data", data
+        #console.log "new data", data
         @set data
         @checkOutDated!
 
@@ -70,7 +70,8 @@ define do
     if DEBUG
       window.sources = sources
 
-    AppMain = React.create-class do
+
+    DashboardStd = React.create-class do
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
@@ -135,7 +136,6 @@ define do
               div {className: 'ui segment swidget'},
                 "TEST FIN"
 
-
       componentDidMount: ->
         w = 145
         h = 145
@@ -157,6 +157,27 @@ define do
             ($ li).first().children().first()
               .width widgetW
               .height widgetH
+
+
+    AppMain = React.create-class do
+      url: ->
+        'http://' + document.domain + ':' + location.port + "/dash"
+
+      componentWillMount: ->
+        console.log "MOUNTED"
+        @socket = io.connect @url!
+        console.log @url!
+        console.log @socket
+        # update model when data are send on msg "change"
+        @socket.on \update @dashUpdated.bind @
+
+      dashUpdated: (data) ->
+        console.log "UPDATE"
+        console.log data
+
+      render: ->
+        DashboardStd {}
+
 
     # returned value: just the main component
     AppMain

@@ -56,7 +56,17 @@ app.register_blueprint(ctrl_api, url_prefix="/ctrl")
 def index():
     return render_template('index.html')
 
+@app.route("/dash/<dname>")
+def switch_dash(dname):
+    res = {}
+    res["dash"] = dname
+    socketio.emit('update', res, namespace="/dash")
+    return jsonify(res)
 
+@socketio.on('connect', namespace="/dash")
+def dash_client_connect():
+    print "Connected to dash"
+    emit('Connected', {"ok":"ok"})
 
 @app.route("/source")
 def sources_list():
