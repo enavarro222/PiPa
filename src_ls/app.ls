@@ -79,53 +79,64 @@ define do
                   widget.TimeDate {}
                 div {className: 'ui six wide column'},
                   widget.WeekNum {}
-            li {'data-row': 2, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment swidget'},
-                "TEST"
-            li {'data-row': 1, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.count
                 label: "count"
-            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.extTemp
                 label: 
                   span {className: 'ui small header'},
                     "Temp. ext."
-            li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.extHum
                 label: 
                   span {className: 'ui small header'},
                     "Hum. ext."
-            li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.grangeTemp
                 label: 
                   span {className: 'ui small header'},
                     "Temp. grange"
-            li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
+            li {'data-row': 1, 'data-col': 8, 'data-sizex': 1, 'data-sizey': 1},
               widget.TextGauge do
                 model: sources.cpu
                 icon: "dashboard"
-            li {'data-row': 1, 'data-col': 8, 'data-sizex': 2, 'data-sizey': 2},
+
+            li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
               widget.CircleGauge do
                 model: sources.cpu
                 icon: "dashboard"
                 min: 0
                 max: 100
-                
+
+            li {'data-row': 3, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
+              div {className: 'ui segment swidget'},
+                "TEST"
+            li {'data-row': 4, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
+              div {className: 'ui segment swidget'},
+                "TEST"
+            li {'data-row': 4, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
+              div {className: 'ui segment swidget'},
+                "TEST A"
+            li {'data-row': 4, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
+              div {className: 'ui segment swidget'},
+                "TEST FIN"
+
 
       componentDidMount: ->
-        w = 140
-        h = 140
+        w = 145
+        h = 145
         mw = 10
         mh = 10
         @grid = ($ @refs.maingrid.getDOMNode!).gridster do
           'widget_margins': [mw, mh]
           'widget_base_dimensions': [w, h]
-          'max_cols': 15
-          'min_cols': 1
+          'max_cols': 8
+          'min_cols': 8
         .data 'gridster'
         @grid.disable()
         $ @refs.maingrid.getDOMNode!
