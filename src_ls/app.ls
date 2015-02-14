@@ -12,9 +12,10 @@ define do
     moment.locale "fr"
 
     SourceModel = Backbone.Model.extend do
-      name: "source"
+      idAttribute: "name"
 
       defaults:
+        name: null
         value: 42
         unit: null
         last_update: null
@@ -23,10 +24,12 @@ define do
         error: null         # error msg when outdated
 
       url: ->
-        'http://' + document.domain + ':' + location.port + "/source/" + @name
+        'http://' + document.domain + ':' + location.port + "/source/" + (@get \name)
 
       initialize: (attr, options) ->
-        @name = options.name || @name
+        #TODO manage 404, unexisting source
+        console.log "Init source (" + (@get \name) + ")"
+        #console.log "url: " + @.url!
         @checkOutDatedTimeout = null
         @socket = io.connect @url!
         # update model when data are send on msg "change"
@@ -57,18 +60,13 @@ define do
         @
 
 
-    # definition des sources de données
-    #TODO decouverte en auto !
-    sources =
-      count: new SourceModel {}, {name: "count"}
-      cpu: new SourceModel {}, {name: "cpu"}
-      extTemp: new SourceModel {}, {name: "ext_temp"}
-      extHum: new SourceModel {}, {name: "ext_hum"}
-      grangeTemp: new SourceModel {}, {name: "grange_temp"}
-      consoPc: new SourceModel {}, {name: "conso_pc"}
+    SourcesCollection = Backbone.Collection.extend do
+        url: ->
+          '/source'
+        model: SourceModel
 
-    if DEBUG
-      window.sources = sources
+        parse: (data) ->
+          data.sources
 
 
     AbstractGridDashboard =
@@ -99,108 +97,122 @@ define do
               .height widgetH
 
 
-    DashboardStd = React.create-class do
-      mixins: [AbstractGridDashboard]
+    defineDashboards = (sources, dashboards) ->
+      console.log "Create dashboards !"
+      MainDashboard = React.create-class do
+        mixins: [AbstractGridDashboard]
+        render: ->
+          div {className: 'gridster'},
+            ul {ref: 'maingrid'},
+              li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
+                div {className: 'ui segment grid swidget'},
+                  div {className: 'ui ten wide column'},
+                    widget.TimeDate {}
+                  div {className: 'ui six wide column'},
+                    widget.WeekNum {}
+              li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \count
+                  label: "count"
+              li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \extTemp
+                  label: 
+                    span {className: 'ui small header'},
+                      "Temp. ext."
+              li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \extHum
+                  label: 
+                    span {className: 'ui small header'},
+                      "Hum. ext."
+              li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \grangeTemp
+                  label: 
+                    span {className: 'ui small header'},
+                      "Temp. grange"
+              li {'data-row': 1, 'data-col': 8, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \cpu
+                  icon: "dashboard"
+
+              li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+                widget.CircleGauge do
+                  model: sources.get \cpu
+                  icon: "dashboard"
+                  min: 0
+                  max: 100
+
+              li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+                widget.CircleGauge do
+                  model: sources.get \consoPc
+                  icon: "dashboard"
+                  min: 0
+                  max: 300
+
+      SecondDashboard =  React.create-class do
+        mixins: [AbstractGridDashboard]
+        render: ->
+          div {className: 'gridster'},
+            ul {ref: 'maingrid'},
+              li {'data-row': 1, 'data-col': 4, 'data-sizex': 3, 'data-sizey': 1},
+                div {className: 'ui segment grid swidget'},
+                  div {className: 'ui ten wide column'},
+                    widget.TimeDate {}
+                  div {className: 'ui six wide column'},
+                    widget.WeekNum {}
+
+              li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 3},
+                widget.CircleGauge do
+                  model: sources.get \consoPc
+                  icon: "dashboard"
+                  min: 0
+                  max: 300
+
+      # register the dashboards
+      dashboards["main"] = MainDashboard {}
+      dashboards["second"] = SecondDashboard {}
+      'main'
+
+    # default waiting dashboard
+    WaitDashboard = React.create-class do
       render: ->
-        div {className: 'gridster'},
-          ul {ref: 'maingrid'},
-            li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 1},
-              div {className: 'ui segment grid swidget'},
-                div {className: 'ui ten wide column'},
-                  widget.TimeDate {}
-                div {className: 'ui six wide column'},
-                  widget.WeekNum {}
-            li {'data-row': 1, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
-              widget.TextGauge do
-                model: sources.count
-                label: "count"
-            li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
-              widget.TextGauge do
-                model: sources.extTemp
-                label: 
-                  span {className: 'ui small header'},
-                    "Temp. ext."
-            li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
-              widget.TextGauge do
-                model: sources.extHum
-                label: 
-                  span {className: 'ui small header'},
-                    "Hum. ext."
-            li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
-              widget.TextGauge do
-                model: sources.grangeTemp
-                label: 
-                  span {className: 'ui small header'},
-                    "Temp. grange"
-            li {'data-row': 1, 'data-col': 8, 'data-sizex': 1, 'data-sizey': 1},
-              widget.TextGauge do
-                model: sources.cpu
-                icon: "dashboard"
-
-            li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
-              widget.CircleGauge do
-                model: sources.cpu
-                icon: "dashboard"
-                min: 0
-                max: 100
-
-            li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
-              widget.CircleGauge do
-                model: sources.consoPc
-                icon: "dashboard"
-                min: 0
-                max: 300
-
-            li {'data-row': 3, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment swidget'},
-                "TEST"
-            li {'data-row': 4, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment swidget'},
-                "TEST"
-            li {'data-row': 4, 'data-col': 3, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment swidget'},
-                "TEST A"
-            li {'data-row': 4, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
-              div {className: 'ui segment swidget'},
-                "TEST FIN"
-
-
-    SecondDashboard =  React.create-class do
-      mixins: [AbstractGridDashboard]
-      render: ->
-        div {className: 'gridster'},
-          ul {ref: 'maingrid'},
-            li {'data-row': 1, 'data-col': 4, 'data-sizex': 3, 'data-sizey': 1},
-              div {className: 'ui segment grid swidget'},
-                div {className: 'ui ten wide column'},
-                  widget.TimeDate {}
-                div {className: 'ui six wide column'},
-                  widget.WeekNum {}
-
-            li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 3},
-              widget.CircleGauge do
-                model: sources.consoPc
-                icon: "dashboard"
-                min: 0
-                max: 300
-
+        div {className: "ui active dimmer"},
+          div {className: "ui loader"}
 
     AppMain = React.create-class do
       url: ->
         'http://' + document.domain + ':' + location.port + "/dash"
 
-      dashboards: # list all available dashboards
-        std: DashboardStd {}
-        second: SecondDashboard {}
+      # list all available dashboards
+      dashboards:
+        wait: WaitDashboard {}
+  
+      # alls data sources
+      sources: new SourcesCollection []
 
       getInitialState: ->
-        dash: \std
+        dash: \wait
 
       componentWillMount: ->
-        console.log "MOUNTED"
+        if DEBUG
+          window.sources = @sources
+          window.dashboards = @dashboards
+        # fetch sources
+        console.log("create")
+        @sources.fetch do
+          success: @createAppDashboards.bind @
+        # connect on dashboard change from server
         @socket = io.connect @url!
         # update model when data are send on msg "change"
         @socket.on \update @dashUpdated.bind @
+
+      createAppDashboards: ->
+        #call external function
+        dash = defineDashboards(@sources, @dashboards)
+        @setState do
+            dash: dash
 
       componentWillUnmount: ->
         @socket.off \update @dashUpdated.bind @
@@ -217,6 +229,8 @@ define do
         # render the selected dashboard
         @dashboards[@state.dash]
 
+    if DEBUG
+      window.app = AppMain
 
     # returned value: just the main component
     AppMain

@@ -4,7 +4,7 @@ import sys
 import logging
 
 from flask import Flask
-from flask import render_template, jsonify
+from flask import render_template, jsonify, abort
 from flask.ext.socketio import SocketIO
 from flask.ext.socketio import emit
 
@@ -31,10 +31,10 @@ with open("emonsrc_config_maison.txt") as emoncfg:
 sources = [
     StupidCount("count", update_freq=10),
     CpuUsage("cpu"),
-    EmoncmsSource("ext_temp", emoncms_grange, feedid=34, unit="°C"),
-    EmoncmsSource("ext_hum", emoncms_grange, feedid=38, unit="%"),
-    EmoncmsSource("grange_temp", emoncms_grange, feedid=40, unit="°C"),
-    EmoncmsSource("conso_pc", emoncms_maison, feedid=54, unit="W"),
+    EmoncmsSource("extTemp", emoncms_grange, feedid=34, unit="°C"),
+    EmoncmsSource("extHum", emoncms_grange, feedid=38, unit="%"),
+    EmoncmsSource("grangeTemp", emoncms_grange, feedid=40, unit="°C"),
+    EmoncmsSource("consoPc", emoncms_maison, feedid=54, unit="W"),
 ]
 
 logger = logging.getLogger()
@@ -78,6 +78,8 @@ def sources_list():
 
 @app.route("/source/<source>")
 def source_get(source):
+    if source not in source_idx:
+        abort(404)
     src = source_idx[source]
     res = src.export()
     return jsonify(res)
