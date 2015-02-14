@@ -21,7 +21,7 @@
       }
     }
   });
-  require(['react', 'app'], function(React, AppMain){
-    return React.render(React.createElement(AppMain), document.getElementById("main"));
+  require(['react', 'app'], function(React, app){
+    return React.render(app, document.getElementById("main"));
   });
 }).call(this);

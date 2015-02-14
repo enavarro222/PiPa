@@ -15,7 +15,6 @@ class EmoncmsSource(AutoUpdateValue):
 
     def update(self):
         values = self.emoncms.get_value(self.feedid)
-        self.value = values["value"]
-        print values["date"]
+        self.value = float(values["value"])
         return values["date"]
 

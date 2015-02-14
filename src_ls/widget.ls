@@ -10,16 +10,16 @@ define do
     window.React = React
 
     widget.CircleGauge = React.create-class do
-      delta: Math.PI/7.5    # angle en plus de horisontal
 
       getDefaultProps: ->
         min: 0
         max: 1
+        delta: Math.PI/7.5    # angle en plus de horizontal
 
       componentWillMount: ->
         @angle = d3.scale.linear!
           .domain [@props.min, @props.max] 
-          .range [- @delta - Math.PI/2, @delta + Math.PI/2]
+          .range [- @props.delta - Math.PI/2, @props.delta + Math.PI/2]
         @props.model.on \change, @modelChanged.bind @
 
       componentWillUnmount: ->
@@ -50,16 +50,16 @@ define do
             .select "g"
             .attr "transform", "translate(" + (w / 2) + "," + (h / 2) + ")"
 
-
+        text_value = @props.model.get \value
+        console.log text_value 
+        if @props.format_value
+          text_value = @props.format_value text_value
         d3.select @refs.gaugeText.getDOMNode!
-            .text (@props.model.get \value) + " " + (@props.model.get \unit)
+            .text (text_value) + " " + (@props.model.get \unit)
             .attr "transform", "translate(" + 0 + "," + (h / 4) + ")"
             .attr "text-anchor", "middle"
             .attr "alignment-baseline", "middle"
-            .attr "font-family", "Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;"
-            .attr "font-size", "1.78em"
-            .attr "font-weight", "bold"
-            .attr "fill", "black"
+            .classed("gauge_text", true)
 
         bgArc = d3.svg.arc!
           .innerRadius rIn
@@ -68,19 +68,17 @@ define do
           .endAngle @angle @props.max
 
         d3.select @refs.gaugeBackground.getDOMNode!
-          .attr "fill", (d, i) ->
-            d3.rgb("black");
+          .classed("gauge_bg", true)
           .attr "d", bgArc
 
         fgArc = d3.svg.arc!
-          .innerRadius rIn
-          .outerRadius rOut
+          .innerRadius rIn-0.3
+          .outerRadius rOut+0.3
           .startAngle @angle @props.min
           .endAngle Math.min (@angle (@props.model.get \value)), (@angle @props.max)
 
         d3.select @refs.gaugeItSelf.getDOMNode!
-          .attr "fill", (d, i) ->
-            d3.rgb("red");
+          .classed("gauge_fg", true)
           .attr "d", fgArc
         @
 

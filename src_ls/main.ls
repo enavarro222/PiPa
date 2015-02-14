@@ -28,5 +28,5 @@ require.config do
     semantic: 
       deps: [ \jquery ]
 
-require [ \react, \app ], (React, AppMain) ->
-  React.render (React.createElement AppMain), document.getElementById("main")
+require [ \react, \app ], (React, app) ->
+  React.render app, document.getElementById("main")

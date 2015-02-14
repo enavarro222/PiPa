@@ -7,15 +7,15 @@
     widget = {};
     window.React = React;
     widget.CircleGauge = React.createClass({
-      delta: Math.PI / 7.5,
       getDefaultProps: function(){
         return {
           min: 0,
-          max: 1
+          max: 1,
+          delta: Math.PI / 7.5
         };
       },
       componentWillMount: function(){
-        this.angle = d3.scale.linear().domain([this.props.min, this.props.max]).range([-this.delta - Math.PI / 2, this.delta + Math.PI / 2]);
+        this.angle = d3.scale.linear().domain([this.props.min, this.props.max]).range([-this.props.delta - Math.PI / 2, this.props.delta + Math.PI / 2]);
         return this.props.model.on('change', this.modelChanged.bind(this));
       },
       componentWillUnmount: function(){
@@ -38,7 +38,7 @@
         }))));
       },
       renderSvg: function(){
-        var parent, w, h, rOut, rIn, svgg, bgArc, fgArc;
+        var parent, w, h, rOut, rIn, svgg, text_value, bgArc, fgArc;
         parent = $(this.getDOMNode()).parent();
         w = parent.width();
         h = parent.height();
@@ -46,15 +46,16 @@
         rIn = 0.6 * rOut;
         console.log(w, h);
         svgg = d3.select(this.refs.gauge.getDOMNode()).attr("width", w).attr("height", h).select("g").attr("transform", "translate(" + w / 2 + "," + h / 2 + ")");
-        d3.select(this.refs.gaugeText.getDOMNode()).text(this.props.model.get('value') + " " + this.props.model.get('unit')).attr("transform", "translate(" + 0 + "," + h / 4 + ")").attr("text-anchor", "middle").attr("alignment-baseline", "middle").attr("font-family", "Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;").attr("font-size", "1.78em").attr("font-weight", "bold").attr("fill", "black");
+        text_value = this.props.model.get('value');
+        console.log(text_value);
+        if (this.props.format_value) {
+          text_value = this.props.format_value(text_value);
+        }
+        d3.select(this.refs.gaugeText.getDOMNode()).text(text_value + " " + this.props.model.get('unit')).attr("transform", "translate(" + 0 + "," + h / 4 + ")").attr("text-anchor", "middle").attr("alignment-baseline", "middle").classed("gauge_text", true);
         bgArc = d3.svg.arc().innerRadius(rIn).outerRadius(rOut).startAngle(this.angle(this.props.min)).endAngle(this.angle(this.props.max));
-        d3.select(this.refs.gaugeBackground.getDOMNode()).attr("fill", function(d, i){
-          return d3.rgb("black");
-        }).attr("d", bgArc);
-        fgArc = d3.svg.arc().innerRadius(rIn).outerRadius(rOut).startAngle(this.angle(this.props.min)).endAngle(Math.min(this.angle(this.props.model.get('value')), this.angle(this.props.max)));
-        d3.select(this.refs.gaugeItSelf.getDOMNode()).attr("fill", function(d, i){
-          return d3.rgb("red");
-        }).attr("d", fgArc);
+        d3.select(this.refs.gaugeBackground.getDOMNode()).classed("gauge_bg", true).attr("d", bgArc);
+        fgArc = d3.svg.arc().innerRadius(rIn - 0.3).outerRadius(rOut + 0.3).startAngle(this.angle(this.props.min)).endAngle(Math.min(this.angle(this.props.model.get('value')), this.angle(this.props.max)));
+        d3.select(this.refs.gaugeItSelf.getDOMNode()).classed("gauge_fg", true).attr("d", fgArc);
         return this;
       },
       componentDidMount: function(){
