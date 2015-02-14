@@ -71,7 +71,36 @@ define do
       window.sources = sources
 
 
+    AbstractGridDashboard =
+      widget_w: 145
+      widget_h: 145
+      margin_w: 10
+      margin_h: 10
+      componentDidMount: ->
+        w = @widget_w
+        h = @widget_h
+        mw = @margin_w
+        mh = @margin_h
+        @grid = ($ @refs.maingrid.getDOMNode!).gridster do
+          'widget_margins': [mw, mh]
+          'widget_base_dimensions': [w, h]
+          'max_cols': 8
+          'min_cols': 8
+        .data 'gridster'
+        @grid.disable()
+        $ @refs.maingrid.getDOMNode!
+          .find("li").each (i, li) ->
+            sizex = ($ li).attr "data-sizex"
+            sizey = ($ li).attr "data-sizey"
+            widgetW = w*sizex + 2*mw*(sizex - 1)
+            widgetH = h*sizey + 2*mh*(sizey - 1)
+            ($ li).first().children().first()
+              .width widgetW
+              .height widgetH
+
+
     DashboardStd = React.create-class do
+      mixins: [AbstractGridDashboard]
       render: ->
         div {className: 'gridster'},
           ul {ref: 'maingrid'},
@@ -115,7 +144,6 @@ define do
                 min: 0
                 max: 100
 
-
             li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
               widget.CircleGauge do
                 model: sources.consoPc
@@ -136,47 +164,58 @@ define do
               div {className: 'ui segment swidget'},
                 "TEST FIN"
 
-      componentDidMount: ->
-        w = 145
-        h = 145
-        mw = 10
-        mh = 10
-        @grid = ($ @refs.maingrid.getDOMNode!).gridster do
-          'widget_margins': [mw, mh]
-          'widget_base_dimensions': [w, h]
-          'max_cols': 8
-          'min_cols': 8
-        .data 'gridster'
-        @grid.disable()
-        $ @refs.maingrid.getDOMNode!
-          .find("li").each (i, li) ->
-            sizex = ($ li).attr "data-sizex"
-            sizey = ($ li).attr "data-sizey"
-            widgetW = w*sizex + 2*mw*(sizex - 1)
-            widgetH = h*sizey + 2*mh*(sizey - 1)
-            ($ li).first().children().first()
-              .width widgetW
-              .height widgetH
+
+    SecondDashboard =  React.create-class do
+      mixins: [AbstractGridDashboard]
+      render: ->
+        div {className: 'gridster'},
+          ul {ref: 'maingrid'},
+            li {'data-row': 1, 'data-col': 4, 'data-sizex': 3, 'data-sizey': 1},
+              div {className: 'ui segment grid swidget'},
+                div {className: 'ui ten wide column'},
+                  widget.TimeDate {}
+                div {className: 'ui six wide column'},
+                  widget.WeekNum {}
+
+            li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 3},
+              widget.CircleGauge do
+                model: sources.consoPc
+                icon: "dashboard"
+                min: 0
+                max: 300
 
 
     AppMain = React.create-class do
       url: ->
         'http://' + document.domain + ':' + location.port + "/dash"
 
+      dashboards: # list all available dashboards
+        std: DashboardStd {}
+        second: SecondDashboard {}
+
+      getInitialState: ->
+        dash: \std
+
       componentWillMount: ->
         console.log "MOUNTED"
         @socket = io.connect @url!
-        console.log @url!
-        console.log @socket
         # update model when data are send on msg "change"
         @socket.on \update @dashUpdated.bind @
 
-      dashUpdated: (data) ->
-        console.log "UPDATE"
-        console.log data
+      componentWillUnmount: ->
+        @socket.off \update @dashUpdated.bind @
+
+      dashUpdated: (data) !->
+        new_dash = data.dash
+        if new_dash of @dashboards
+          @setState do
+            dash: new_dash
+        else
+          console.log("ERROR: server ask an unexisting dash ('#new_dash')")
 
       render: ->
-        DashboardStd {}
+        # render the selected dashboard
+        @dashboards[@state.dash]
 
 
     # returned value: just the main component

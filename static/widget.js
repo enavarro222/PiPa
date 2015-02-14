@@ -19,7 +19,7 @@
         return this.props.model.on('change', this.modelChanged.bind(this));
       },
       componentWillUnmount: function(){
-        return this.props.off.model('change', this.modelChanged.bind(this));
+        return this.props.model.off('change', this.modelChanged.bind(this));
       },
       modelChanged: function(){
         this.renderSvg();

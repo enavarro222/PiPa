@@ -56,17 +56,18 @@ app.register_blueprint(ctrl_api, url_prefix="/ctrl")
 def index():
     return render_template('index.html')
 
+@socketio.on('connect', namespace="/dash")
+def dash_client_connect():
+    print "Connected to dash"
+    emit('Connected', {"ok":"ok"})
+
 @app.route("/dash/<dname>")
 def switch_dash(dname):
     res = {}
     res["dash"] = dname
     socketio.emit('update', res, namespace="/dash")
+    res["comment"] = "This new dash has been asked, it should be ok..."
     return jsonify(res)
-
-@socketio.on('connect', namespace="/dash")
-def dash_client_connect():
-    print "Connected to dash"
-    emit('Connected', {"ok":"ok"})
 
 @app.route("/source")
 def sources_list():
@@ -74,7 +75,6 @@ def sources_list():
     res["nb"] = len(sources)
     res["sources"] = [src.desc() for src in sources]
     return jsonify(res)
-
 
 @app.route("/source/<source>")
 def source_get(source):

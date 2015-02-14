@@ -23,7 +23,7 @@ define do
         @props.model.on \change, @modelChanged.bind @
 
       componentWillUnmount: ->
-        @props.off.model \change, @modelChanged.bind @
+        @props.model.off \change, @modelChanged.bind @
 
       modelChanged: !->
         @renderSvg!
