@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 import sys
+import logging
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import calendar
 
@@ -15,6 +16,7 @@ class EmoncmsClient(object):
     """
 
     def __init__(self, url, apikey=None):
+        self._logger = logging.getLogger("EmoncmsClient")
         self.url = url
         self.apikey = apikey
 
@@ -26,7 +28,7 @@ class EmoncmsClient(object):
         results.raise_for_status()
         if results.text == "false":
             raise RuntimeError("Impossible to get the data (%s)" % results.url)
-        #print query
+        self._logger.debug("query: %s" % results.url)
         return results.json()
 
     def _default_params(self):
@@ -53,14 +55,40 @@ class EmoncmsClient(object):
             raise ValueError("Feed not found")
         return all_data[fid]
 
-    def get_data(self, fid, start_date, delta_sec, nb_data=10000):
+    def _check_interval(self, delta_sec, start_date=None, end_date=None, nb_data=None):
+        """ check inputs, set defaults
+
+        >>> emon = EmoncmsClient("http://localhost/")
+        >>> # if not given end_date will be now
+        >>> delta_sec, start_date, nb_data = emon._check_interval(60)
+        >>> nb_data # default value
+        100
+        >>> (datetime.now() - start_date).total_seconds() - delta_sec*nb_data < 1
+        True
+        >>> # else start_time is computed from other params
+        >>> delta_sec, start_date, nb_data = emon._check_interval(60*60, end_date=datetime(2015, 2, 11), nb_data=48)
+        >>> start_date.isoformat()
+        '2015-02-09T00:00:00'
+        """
+        default_nb_data = 100
+        if start_date is not None and end_date is not None:
+            if nb_data is not None:
+                raise ValueError("End and start date are given , you can not set nb_data")
+            nb_data = (end_date - start_date).total_seconds() / delta_sec
+        if start_date is None:
+            if end_date is None:
+                self._logger.info("Set end_time to now (default)")
+                end_date = datetime.now()
+            if nb_data is None:
+                self._logger.info("Set nb_data to 100 (default)")
+                nb_data = default_nb_data
+            start_date = end_date - timedelta(0, nb_data*delta_sec)
+        return delta_sec, start_date, nb_data
+
+    def get_data(self, fid, delta_sec, start_date=None, end_date=None, nb_data=None):
         """
         :param fid: feed ID to get
         """
-        ## make the requests
-        t_start = time.mktime( start_date.timetuple() )*1000
-        #t_start = calendar.timegm(start_date.timetuple())*1000
-
         # search for feed
         for feed in self.feeds():
             if fid == feed['id']:
@@ -68,6 +96,16 @@ class EmoncmsClient(object):
                 break
         else:
             raise ValueError("Field %s is unknow" % fid)
+
+        delta_sec, start_date, nb_data = self._check_interval(
+            delta_sec=delta_sec,
+            start_date=start_date,
+            end_date=end_date,
+            nb_data=nb_data
+        )
+        ## make the requests
+        t_start = time.mktime( start_date.timetuple() )*1000
+        #t_start = calendar.timegm(start_date.timetuple())*1000
         
         # get datas
         data_brut = []
@@ -81,8 +119,8 @@ class EmoncmsClient(object):
             query = self.url + "/feed/average.json"
             params = self._default_params()
             params["id"] = fid
-            params["start"] = int(t_start)
-            params["end"] = t_end
+            params["start"] = "%d" % t_start
+            params["end"] = "%d" % t_end
             params["interval"] = delta_sec
             
             data_brut += self._get_json(query, params)

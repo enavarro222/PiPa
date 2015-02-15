@@ -85,8 +85,8 @@
           })), li({
             'data-row': 2,
             'data-col': 1,
-            'data-sizex': 2,
-            'data-sizey': 2
+            'data-sizex': 1,
+            'data-sizey': 1
           }, widget.CircleGauge({
             model: sources.get('consoPc'),
             format_value: function(tval){

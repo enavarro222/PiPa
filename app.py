@@ -27,11 +27,16 @@ with open("emonsrc_config_maison.txt") as emoncfg:
     key_beytan = emoncfg.readline().strip()
     emoncms_maison = EmoncmsClient(url, key_beytan)
 
+
+extTemp = EmoncmsSource("extTemp", emoncms_grange, feedid=34, unit="°C")
+extTemp.update_freq = 10
+extTemp.add_plot("by_min", nb_data=60, delta_sec=60)
+
 # data source configuration
 sources = [
     StupidCount("count", update_freq=10),
     CpuUsage("cpu"),
-    EmoncmsSource("extTemp", emoncms_grange, feedid=34, unit="°C"),
+    extTemp,
     EmoncmsSource("extHum", emoncms_grange, feedid=38, unit="%"),
     EmoncmsSource("grangeTemp", emoncms_grange, feedid=40, unit="°C"),
     EmoncmsSource("consoPc", emoncms_maison, feedid=54, unit="W"),

@@ -58,7 +58,7 @@ define do
                   min: 0
                   max: 100
 
-              li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
+              li {'data-row': 2, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
                 widget.CircleGauge do
                   model: sources.get \consoPc
                   format_value: (tval) -> tval.toFixed(1)
