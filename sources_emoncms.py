@@ -32,6 +32,7 @@ class EmoncmsSource(AutoUpdateValue):
 
     def export(self):
         res = super(EmoncmsSource, self).export()
+        res["plots"] = self.plots.keys()
         for plot_name, plot_data in self.plots.iteritems():
             res[plot_name] = [
                 {"date": date, "value": val} for date, val in plot_data.iteritems()

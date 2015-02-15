@@ -35,12 +35,23 @@ define do
           success: @checkOutDated.bind @
         @
 
-      newDataPushed: (data) ->
-        #console.log "new data", data
+      parse: (data) ->
+        if \plots of data
+          console.log data[\plots]
+          for pname in data[\plots]
+            console.log pname
+            for val in data[pname]
+              console.log val
+              val[\date] = new Date val[\date]
+        data
+
+      newDataPushed: (data) !->
+        console.log "new data", data
+        data = @parse data
         @set data
         @checkOutDated!
 
-      checkOutDated: ->
+      checkOutDated: !->
         clearTimeout @checkOutDatedTimeout
         lastUpdate = moment @.get 'last_update'
         if lastUpdate.isValid!
@@ -54,7 +65,6 @@ define do
             @.set \outdated, false
           # check every 15 seconds max:
             @checkOutDatedTimeout = setTimeout (@checkOutDated.bind @), (Math.min timeout, 15)*1000
-        @
 
 
     dboard.SourcesCollection = Backbone.Collection.extend do

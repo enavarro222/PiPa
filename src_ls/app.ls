@@ -35,6 +35,10 @@ define do
                   label: 
                     span {className: 'ui small header'},
                       "Temp. ext."
+              li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
+                widget.MinimalPlot do
+                  model: sources.get \frigoKw
+                  plotAttr: \byHours
               li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
                 widget.TextGauge do
                   model: sources.get \extHum

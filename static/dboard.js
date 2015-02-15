@@ -29,9 +29,27 @@
         });
         return this;
       },
+      parse: function(data){
+        var i$, ref$, len$, pname, j$, ref1$, len1$, val;
+        if ('plots' in data) {
+          console.log(data['plots']);
+          for (i$ = 0, len$ = (ref$ = data['plots']).length; i$ < len$; ++i$) {
+            pname = ref$[i$];
+            console.log(pname);
+            for (j$ = 0, len1$ = (ref1$ = data[pname]).length; j$ < len1$; ++j$) {
+              val = ref1$[j$];
+              console.log(val);
+              val['date'] = new Date(val['date']);
+            }
+          }
+        }
+        return data;
+      },
       newDataPushed: function(data){
+        console.log("new data", data);
+        data = this.parse(data);
         this.set(data);
-        return this.checkOutDated();
+        this.checkOutDated();
       },
       checkOutDated: function(){
         var lastUpdate, timeout;
@@ -50,7 +68,6 @@
             this.checkOutDatedTimeout = setTimeout(this.checkOutDated.bind(this), Math.min(timeout, 15) * 1000);
           }
         }
-        return this;
       }
     });
     dboard.SourcesCollection = Backbone.Collection.extend({

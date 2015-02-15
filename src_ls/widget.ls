@@ -4,13 +4,13 @@ define do
     # Advanced functional style programming using prelude-ls
     {map, filter, slice, lines, any, fold, Str} = require 'prelude-ls'
     # DOM building function from React
-    {i, div, tr, td, span, kbd, button, ul, li, a, h1, h2, h3, input, form, table, th, tr, td, thead, tbody, label, nav, p, ruby, rt, svg, g, path, text} = React.DOM
+    {i, div, tr, td, span, kbd, button, ul, li, a, h1, h2, h3, input, form, table, th, tr, td, thead, tbody, label, nav, p, ruby, rt, svg, g, path, rect, text} = React.DOM
 
     widget = {}
     window.React = React
 
-    widget.CircleGauge = React.create-class do
 
+    widget.CircleGauge = React.create-class do
       getDefaultProps: ->
         min: 0
         max: 1
@@ -51,7 +51,7 @@ define do
             .attr "transform", "translate(" + (w / 2) + "," + (h / 2) + ")"
 
         text_value = @props.model.get \value
-        console.log text_value 
+        console.log text_value
         if @props.format_value
           text_value = @props.format_value text_value
         d3.select @refs.gaugeText.getDOMNode!
@@ -80,6 +80,86 @@ define do
         d3.select @refs.gaugeItSelf.getDOMNode!
           .classed("gauge_fg", true)
           .attr "d", fgArc
+        @
+
+      componentDidMount: ->
+        @renderSvg!
+
+
+
+    widget.MinimalPlot = React.create-class do
+      getDefaultProps: ->
+        min: 0
+        max: 1
+        delta: Math.PI/7.5    # angle en plus de horizontal
+
+      componentWillMount: ->
+        @angle = d3.scale.linear!
+          .domain [@props.min, @props.max] 
+          .range [- @props.delta - Math.PI/2, @props.delta + Math.PI/2]
+        @props.model.on \change, @modelChanged.bind @
+        # the plot area (to compute plot path)
+        @area = d3.svg.area()
+          .interpolate("step-after") # bar plot
+          #.interpolate("monotone");
+
+      componentWillUnmount: ->
+        @props.model.off \change, @modelChanged.bind @
+
+      modelChanged: !->
+        @renderSvg!
+
+      render: ->
+        div {className: 'ui center aligned segment swidget'},
+          svg {ref: "plot"},
+            g {},
+              rect {ref: "background"}
+              path {}
+
+      renderSvg: ->
+        parent = ($ @getDOMNode!).parent!
+        w = parent.width!
+        h = parent.height!
+        rOut = 0.8 * Math.min w, h / 2
+        rIn = 0.6 * rOut
+        console.log w, h
+        
+        @x = d3.time.scale!
+        @y = d3.scale.linear!
+
+        svgg = d3.select @refs.plot.getDOMNode!
+          .attr "width", w
+          .attr "height", h
+          .select "g"
+          #.attr "transform", "translate(" + (w / 2) + "," + (h / 2) + ")"
+
+        data = @props.model.get @props.plotAttr
+        if data
+          dmin = d3.min data, (d) -> d.date
+          dmax = d3.max data, (d) -> d.date
+          console.log "DATA"
+          console.log dmin, dmax
+
+          # update x and y scale range and domain
+
+          @x.range [0, w]
+            .domain [dmin, dmax]
+
+          @y.range [h, 0]
+            .domain [0, d3.max data, (d) -> d.value]
+
+          # configure plot area
+          @area.x ((d) -> @x d.date).bind @
+            .y0 h
+            .y1 ((d) -> @y d.value).bind @
+
+
+          # plot the data area
+          svgg.select "path"
+            .datum data
+            .attr "class", "area"
+            .attr "d", @area
+
         @
 
       componentDidMount: ->

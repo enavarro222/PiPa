@@ -29,14 +29,17 @@ with open("emonsrc_config_maison.txt") as emoncfg:
 
 
 extTemp = EmoncmsSource("extTemp", emoncms_grange, feedid=34, unit="°C")
-extTemp.update_freq = 10
-extTemp.add_plot("by_min", nb_data=60, delta_sec=60)
+extTemp.add_plot("byMin", nb_data=24, delta_sec=60*60)
+
+frigoKw = EmoncmsSource("frigoKw", emoncms_maison, feedid=57, unit="W")
+frigoKw.add_plot("byHours", nb_data=24, delta_sec=60*60)
 
 # data source configuration
 sources = [
     StupidCount("count", update_freq=10),
     CpuUsage("cpu"),
     extTemp,
+    frigoKw,
     EmoncmsSource("extHum", emoncms_grange, feedid=38, unit="%"),
     EmoncmsSource("grangeTemp", emoncms_grange, feedid=40, unit="°C"),
     EmoncmsSource("consoPc", emoncms_maison, feedid=54, unit="W"),
