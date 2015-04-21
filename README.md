@@ -31,3 +31,27 @@ API:
 * GET /sources/<source_name>: recupération JSON des data de cette source
 
 
+Hardware
+========
+
+(TODO)
+
+Install
+=======
+
+(TODO)
+
+Configure
+=========
+
+* data sources are configured in app.py
+* dashboards are defined on src_ls/app.ls
+
+TODO
+====
+
+* translate README all in english
+* add installation procedure
+* add some screenshot
+
+

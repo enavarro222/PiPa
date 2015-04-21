@@ -15,6 +15,8 @@ from sources_emoncms import EmoncmsSource
 
 from ctrl_api import api as ctrl_api
 
+### Data sources configuration
+
 ## manage emoncms data source
 with open("emonsrc_config_grange.txt") as emoncfg:
     url = emoncfg.readline().strip()
@@ -44,6 +46,8 @@ sources = [
     EmoncmsSource("grangeTemp", emoncms_grange, feedid=40, unit="°C"),
     EmoncmsSource("consoPc", emoncms_maison, feedid=54, unit="W"),
 ]
+
+### App it self
 
 logger = logging.getLogger()
 
