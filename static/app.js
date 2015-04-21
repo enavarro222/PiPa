@@ -55,6 +55,14 @@
             plotAttr: 'byHours'
           })), li({
             'data-row': 1,
+            'data-col': 5,
+            'data-sizex': 1,
+            'data-sizey': 1
+          }, widget.MinimalPlot({
+            model: sources.get('extTemp'),
+            plotAttr: 'byTwoMins'
+          })), li({
+            'data-row': 1,
             'data-col': 6,
             'data-sizex': 1,
             'data-sizey': 1

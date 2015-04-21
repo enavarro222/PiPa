@@ -19,6 +19,12 @@ class EmoncmsClient(object):
         self._logger = logging.getLogger("EmoncmsClient")
         self.url = url
         self.apikey = apikey
+        self._tres = {}
+        # compute timeres
+        res = self._get_json(self.url + "/feed/list.json")
+        for feed in res:
+            fid = int(feed["id"])
+            self._tres[fid] = self._compute_time_res(fid)
 
     def _get_json(self, url, params=None):
         if params is None:
@@ -40,10 +46,11 @@ class EmoncmsClient(object):
     def feeds(self):
         """ Get data about all available feeds
         """
-        res = self._get_json(self.url + "/feed/list.json")  #XXX: userid=1 to get public data (to check)
+        res = self._get_json(self.url + "/feed/list.json")
         for feed in res:
-            feed["id"] = int(feed["id"])
-            feed["date"] = datetime.fromtimestamp(feed["time"])
+            feed[u"id"] = int(feed["id"])
+            feed[u"tres"] = self.time_res(feed["id"])
+            feed[u"date"] = datetime.fromtimestamp(feed["time"])
         return res
 
     def get_value(self, fid):
@@ -54,6 +61,28 @@ class EmoncmsClient(object):
         if fid not in all_data:
             raise ValueError("Feed not found")
         return all_data[fid]
+
+    def time_res(self, fid):
+        return self._tres.get(fid, None)
+
+    def _compute_time_res(self, fid):
+        """ Compute the minimal time resolution (seconds)
+        """
+        last_date = self.get_value(fid)["date"]
+        nb_data = 100
+        ok = False
+        while not ok:
+            # get data 20 mins ago
+            start_date = last_date - timedelta(0, 20*60)
+            data = self.get_data(fid, delta_sec=13, start_date=start_date, nb_data=nb_data)
+            if len(data) >= 2:
+                ok = True
+                tres = (data.index[1]-data.index[0]).total_seconds()
+            else:
+                nb_data *= 2
+            if nb_data > 1000:
+                raise RuntimeError("Impossible to get the time res of the feed, no data ?")
+        return tres
 
     def _check_interval(self, delta_sec, start_date=None, end_date=None, nb_data=None):
         """ check inputs, set defaults
@@ -124,6 +153,12 @@ class EmoncmsClient(object):
             params["interval"] = delta_sec
             
             data_brut += self._get_json(query, params)
+#            if len(data_brut) < nb_to_read:
+#                has_min_res = ""
+#                if len(data_brut) >= 2:
+#                    min_res = (data_brut[1][0] - data_brut[0][0])/1000
+#                    has_min_res = " (min res: %ss)" % min_res
+#                raise ValueError("Get only %d data (/%d) too small temporal resolution%s" % (len(data_brut), nb_to_read, has_min_res))
             nb_read += nb_to_read
             t_start = data_brut[-1][0]
         
@@ -132,6 +167,7 @@ class EmoncmsClient(object):
         dates = [datetime.fromtimestamp(date/1000) for date in dates]
         ts = pd.Series(vals, index=dates, name=feed_name)
         return ts
+
 
 
 def main():

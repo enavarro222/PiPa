@@ -3,12 +3,12 @@
 
 #set -x  #log all execed lin for debug
 set -e
-BASEDIR=/home/pi/rpyboard/
+BASEDIR=/home/pi/pipa/
 APPMODULE=app
 APPNAME=app
 
 # log
-LOGFILE=$BASEDIR/log/rpyboard.log 
+LOGFILE=$BASEDIR/log/pipa.log 
 LOGDIR=$(dirname $LOGFILE)
 LOGLEVEL=debug
 

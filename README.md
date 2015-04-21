@@ -1,5 +1,5 @@
-rPyBoard
-=========
+PiPa (Raspberry Pi Panel)
+=========================
 
 Dashboard pour rPy (ou autre)
 
@@ -13,9 +13,9 @@ Widgets type:
 * generic value (icone, label, value/unit)
 * temperature/humidité d'une pièce/exterieur
 * liste d'info/event (avec date a chaque fois, éventuellement removable)
-  ** passage facteur
-  ** batterie faible (toutes les heures quand c'est le cas)
-  ** pic de conso
+    * passage facteur
+    * batterie faible (toutes les heures quand c'est le cas)
+    * pic de conso
 
 
 Affichage:
