@@ -44,12 +44,13 @@ Install
 Configure
 =========
 
-* data sources are configured in app.py
-* dashboards are defined on src_ls/app.ls
+* data sources are configured in `config.py`
+* dashboards are defined on `src_ls/app.ls`
 
 TODO
 ====
 
+* clear error when dashboard require a source that dosen't exist
 * translate README all in english
 * add installation procedure
 * add some screenshot

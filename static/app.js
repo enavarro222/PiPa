@@ -37,52 +37,6 @@
             label: "count"
           })), li({
             'data-row': 1,
-            'data-col': 5,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.TextGauge({
-            model: sources.get('extTemp'),
-            label: span({
-              className: 'ui small header'
-            }, "Temp. ext.")
-          })), li({
-            'data-row': 1,
-            'data-col': 5,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.MinimalPlot({
-            model: sources.get('frigoKw'),
-            plotAttr: 'byHours'
-          })), li({
-            'data-row': 1,
-            'data-col': 5,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.MinimalPlot({
-            model: sources.get('extTemp'),
-            plotAttr: 'byTwoMins'
-          })), li({
-            'data-row': 1,
-            'data-col': 6,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.TextGauge({
-            model: sources.get('extHum'),
-            label: span({
-              className: 'ui small header'
-            }, "Hum. ext.")
-          })), li({
-            'data-row': 1,
-            'data-col': 7,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.TextGauge({
-            model: sources.get('grangeTemp'),
-            label: span({
-              className: 'ui small header'
-            }, "Temp. grange")
-          })), li({
-            'data-row': 1,
             'data-col': 8,
             'data-sizex': 1,
             'data-sizey': 1
@@ -98,18 +52,6 @@
             model: sources.get('cpu'),
             min: 0,
             max: 100
-          })), li({
-            'data-row': 2,
-            'data-col': 1,
-            'data-sizex': 1,
-            'data-sizey': 1
-          }, widget.CircleGauge({
-            model: sources.get('consoPc'),
-            format_value: function(tval){
-              return tval.toFixed(1);
-            },
-            min: 0,
-            max: 300
           }))));
         }
       });
@@ -137,10 +79,10 @@
             'data-sizex': 3,
             'data-sizey': 3
           }, widget.CircleGauge({
-            model: sources.get('consoPc'),
+            model: sources.get('cpu'),
             icon: "dashboard",
             min: 0,
-            max: 300
+            max: 100
           }))));
         }
       });

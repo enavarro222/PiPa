@@ -16,36 +16,7 @@ from sources_emoncms import EmoncmsSource
 from ctrl_api import api as ctrl_api
 
 ### Data sources configuration
-
-## manage emoncms data source
-with open("emonsrc_config_grange.txt") as emoncfg:
-    url = emoncfg.readline().strip()
-    key_beytan = emoncfg.readline().strip()
-    emoncms_grange = EmoncmsClient(url, key_beytan)
-
-## manage emoncms data source
-with open("emonsrc_config_maison.txt") as emoncfg:
-    url = emoncfg.readline().strip()
-    key_beytan = emoncfg.readline().strip()
-    emoncms_maison = EmoncmsClient(url, key_beytan)
-
-
-extTemp = EmoncmsSource("extTemp", emoncms_grange, feedid=34, unit="°C")
-extTemp.add_plot("byTwoMins", nb_data=60, delta_sec=120)
-
-frigoKw = EmoncmsSource("frigoKw", emoncms_maison, feedid=57, unit="W")
-frigoKw.add_plot("byHours", nb_data=60, delta_sec=15)
-
-# data source configuration
-sources = [
-    StupidCount("count", update_freq=10),
-    CpuUsage("cpu"),
-    extTemp,
-    frigoKw,
-    EmoncmsSource("extHum", emoncms_grange, feedid=38, unit="%"),
-    EmoncmsSource("grangeTemp", emoncms_grange, feedid=40, unit="°C"),
-    EmoncmsSource("consoPc", emoncms_maison, feedid=54, unit="W"),
-]
+from config import sources
 
 ### App it self
 

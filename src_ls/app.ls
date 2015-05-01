@@ -29,32 +29,6 @@ define do
                 widget.TextGauge do
                   model: sources.get \count
                   label: "count"
-              li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
-                widget.TextGauge do
-                  model: sources.get \extTemp
-                  label: 
-                    span {className: 'ui small header'},
-                      "Temp. ext."
-              li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
-                widget.MinimalPlot do
-                  model: sources.get \frigoKw
-                  plotAttr: \byHours
-              li {'data-row': 1, 'data-col': 5, 'data-sizex': 1, 'data-sizey': 1},
-                widget.MinimalPlot do
-                  model: sources.get \extTemp
-                  plotAttr: \byTwoMins
-              li {'data-row': 1, 'data-col': 6, 'data-sizex': 1, 'data-sizey': 1},
-                widget.TextGauge do
-                  model: sources.get \extHum
-                  label: 
-                    span {className: 'ui small header'},
-                      "Hum. ext."
-              li {'data-row': 1, 'data-col': 7, 'data-sizex': 1, 'data-sizey': 1},
-                widget.TextGauge do
-                  model: sources.get \grangeTemp
-                  label: 
-                    span {className: 'ui small header'},
-                      "Temp. grange"
               li {'data-row': 1, 'data-col': 8, 'data-sizex': 1, 'data-sizey': 1},
                 widget.TextGauge do
                   model: sources.get \cpu
@@ -65,13 +39,6 @@ define do
                   model: sources.get \cpu
                   min: 0
                   max: 100
-
-              li {'data-row': 2, 'data-col': 1, 'data-sizex': 1, 'data-sizey': 1},
-                widget.CircleGauge do
-                  model: sources.get \consoPc
-                  format_value: (tval) -> tval.toFixed(1)
-                  min: 0
-                  max: 300
 
       SecondDashboard =  React.create-class do
         mixins: [dboard.AbstractGridDashboard]
@@ -87,10 +54,10 @@ define do
 
               li {'data-row': 1, 'data-col': 1, 'data-sizex': 3, 'data-sizey': 3},
                 widget.CircleGauge do
-                  model: sources.get \consoPc
+                  model: sources.get \cpu
                   icon: "dashboard"
                   min: 0
-                  max: 300
+                  max: 100
 
       # register the dashboards
       dashboards["main"] = MainDashboard {}
