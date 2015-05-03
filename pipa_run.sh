@@ -4,7 +4,7 @@
 #set -x  #log all execed lin for debug
 set -e
 BASEDIR=/home/pi/pipa/
-APPMODULE=app
+APPMODULE=pipa
 APPNAME=app
 
 # log
@@ -20,10 +20,13 @@ NUM_WORKERS=1
 USER=pi
 GROUP=pi
 
+# export config for matplotlib
+export MPLCONFIGDIR=/tmp
+
 ## start the app
 cd $BASEDIR
 # if  virtualenv is used 
-source ./venv/bin/activate
+source ./pipavenv/bin/activate
 
 #pre-start script
 # create log dir if not exist
