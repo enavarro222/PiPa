@@ -181,13 +181,18 @@ define do
         if @props.model.get \error
           varient = "error "
         segClass = "ui center aligned #varient segment swidget"
+        # get text value
+        text_value = @props.model.get \value
+        if @props.format_value
+          text_value = @props.format_value text_value
+        ## create the dom element
         div {className: segClass},
           div {className: "swidgetContent"},
             if @props.icon
               div {className: 'ui huge header'},
                 i {className: 'huge icon ' + @props.icon}
             div {className: 'ui large header'},
-              @props.model.get \value
+              text_value
               if @props.model.get \unit
                 span {},
                   ' '

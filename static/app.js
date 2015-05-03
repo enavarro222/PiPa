@@ -45,6 +45,17 @@
             icon: "dashboard"
           })), li({
             'data-row': 2,
+            'data-col': 4,
+            'data-sizex': 1,
+            'data-sizey': 1
+          }, widget.TextGauge({
+            model: sources.get('tlse_temp'),
+            format_value: function(tval){
+              return tval.toFixed(1);
+            },
+            icon: "world"
+          })), li({
+            'data-row': 2,
             'data-col': 1,
             'data-sizex': 2,
             'data-sizey': 2

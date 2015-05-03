@@ -141,12 +141,16 @@
         this.forceUpdate(null);
       },
       render: function(){
-        var varient, segClass;
+        var varient, segClass, text_value;
         varient = "";
         if (this.props.model.get('error')) {
           varient = "error ";
         }
         segClass = "ui center aligned " + varient + " segment swidget";
+        text_value = this.props.model.get('value');
+        if (this.props.format_value) {
+          text_value = this.props.format_value(text_value);
+        }
         return div({
           className: segClass
         }, div({
@@ -157,7 +161,7 @@
           className: 'huge icon ' + this.props.icon
         })) : void 8, div({
           className: 'ui large header'
-        }, this.props.model.get('value'), this.props.model.get('unit') ? span({}, ' ', this.props.model.get('unit')) : void 8), this.props.label ? this.props.label : void 8), this.props.model.get('error') ? div({
+        }, text_value, this.props.model.get('unit') ? span({}, ' ', this.props.model.get('unit')) : void 8), this.props.label ? this.props.label : void 8), this.props.model.get('error') ? div({
           className: 'floating ui red label'
         }, this.props.model.get('error')) : void 8);
       }

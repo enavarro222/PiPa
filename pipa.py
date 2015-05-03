@@ -8,11 +8,6 @@ from flask import render_template, jsonify, abort
 from flask.ext.socketio import SocketIO
 from flask.ext.socketio import emit
 
-from emoncms import EmoncmsClient
-
-from sources import StupidCount, CpuUsage
-from sources_emoncms import EmoncmsSource
-
 from ctrl_api import api as ctrl_api
 
 ### Data sources configuration

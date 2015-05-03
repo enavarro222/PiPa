@@ -33,6 +33,11 @@ define do
                 widget.TextGauge do
                   model: sources.get \cpu
                   icon: "dashboard"
+              li {'data-row': 2, 'data-col': 4, 'data-sizex': 1, 'data-sizey': 1},
+                widget.TextGauge do
+                  model: sources.get \tlse_temp
+                  format_value: (tval) -> tval.toFixed(1)
+                  icon: "world"
 
               li {'data-row': 2, 'data-col': 1, 'data-sizex': 2, 'data-sizey': 2},
                 widget.CircleGauge do

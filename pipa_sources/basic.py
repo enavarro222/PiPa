@@ -25,6 +25,7 @@ class DataSource(object):
     def export(self):
         return {
             "name": self.name,
+            "timeout": 5*60, # timeout after 5min
         }
 
     def desc(self):
@@ -81,7 +82,9 @@ class AutoUpdateValue(DataSource):
 
     def checked_update(self):
         try:
+            # run the update and get last_update "date"
             last_update = self.update()
+            # check error
             self.error = None
             if last_update is None:
                 last_update = datetime.now()
@@ -108,8 +111,9 @@ class AutoUpdateValue(DataSource):
         res["value"] = self.value
         res["unit"] = self.unit
         res["error"] = self.error
-        print self.last_update
-        res["last_update"] = self.last_update.isoformat()
+        res["timeout"] = self.update_freq * 5 # timeout after 5 update fail
+        if self.last_update is not None:
+            res["last_update"] = self.last_update.isoformat()
         return res
 
 
@@ -119,12 +123,4 @@ class StupidCount(AutoUpdateValue):
 
     def update(self):
         self.value += 1
-
-class CpuUsage(AutoUpdateValue):
-    unit = "%"
-    update_freq = 1.9
-
-    def update(self):
-        import psutil
-        self.value = psutil.cpu_percent(interval=0)
 
